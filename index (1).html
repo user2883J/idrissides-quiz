@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Quiz sur la Dynastie Idrisside</title>
+<link rel="preload" href="oud.mp3" as="audio">
+<style>
+:root{
+  --dark:#081724;
+  --green:#0b4d3a;
+  --gold:#c79a43;
+  --card:rgba(255,255,255,0.03);
+  --glass: rgba(255,255,255,0.04);
+  font-family: "Trebuchet MS", Arial, sans-serif;
+}
+html,body{height:100%;margin:0;background:radial-gradient(circle at 20% 10%, rgba(12,40,30,0.18) 0%, rgba(4,10,18,0.9) 60%), linear-gradient(180deg,#041018 0%, #061621 70%);color:#e9e6df;overflow-x:hidden}
+/* Moroccan zellige motif overlay (green & gold) */
+body::after{
+  content:"";
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image: url('data:image/svg+xml;utf8,\
+  <svg xmlns="http://www.w3.org/2000/svg" width="600" height="600">\
+  <defs>\
+  <pattern id="z" width="120" height="120" patternUnits="userSpaceOnUse">\
+    <rect width="120" height="120" fill="%23060f0b"/>\
+    <g transform="translate(10,10)" fill="%230a3e2f">\
+      <path d="M0 40 L40 0 L80 40 L40 80 Z" opacity="0.9"/>\
+    </g>\
+    <circle cx="60" cy="60" r="8" fill="%23c79a43"/>\
+    <path d="M60 8 L68 28 L92 28 L72 40 L80 60 L60 48 L40 60 L48 40 L28 28 L52 28 Z" fill="%230a3e2f" opacity="0.14"/>\
+  </pattern>\
+  </defs>\
+  <rect width="100%" height="100%" fill="url(%23z)" opacity="0.12"/>\
+  </svg>');
+  background-size:contain;
+  mix-blend-mode:overlay;
+  filter: blur(0.6px) saturate(1.2);
+}
+
+/* entrance overlay */
+#entrance{position:fixed;inset:0;background:linear-gradient(180deg, rgba(2,6,8,0.6), rgba(0,0,0,0.7));display:flex;align-items:center;justify-content:center;z-index:6;backdrop-filter: blur(3px)}
+.entrance-box{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(199,154,67,0.12);padding:28px;border-radius:16px;text-align:center;color:#f3ead8;width:92%;max-width:760px;box-shadow:0 12px 44px rgba(0,0,0,0.7)}
+.title{font-size:26px;color:var(--gold);font-weight:700;margin-bottom:6px}
+.subtitle{color:#eae0d3;margin-bottom:10px}
+.enter-btn{display:inline-block;background:linear-gradient(90deg,var(--gold),#b07a4b);color:#081724;padding:12px 22px;border-radius:12px;text-decoration:none;font-weight:700;box-shadow:0 8px 30px rgba(7,32,24,0.4)}
+.enter-btn:active{transform:translateY(2px)}
+
+/* lanterns */
+.lanterns{position:fixed;inset:0;pointer-events:none;z-index:4}
+.lantern{position:absolute;animation:float 9s ease-in-out infinite;opacity:0.98;filter:drop-shadow(0 6px 18px rgba(0,0,0,0.6))}
+.l1{left:6%;top:12%;animation-duration:10s}
+.l2{left:22%;top:28%;animation-duration:11s}
+.l3{right:18%;top:18%;animation-duration:9s}
+.l4{right:6%;top:38%;animation-duration:12s}
+@keyframes float{0%{transform:translateY(0) translateX(0) rotate(-2deg)}50%{transform:translateY(-22px) translateX(6px) rotate(3deg)}100%{transform:translateY(0) translateX(0) rotate(-2deg)}}
+
+/* main layout */
+.container{position:relative;z-index:3;padding:48px 20px;max-width:980px;margin:0 auto;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(0,0,0,0.6);color:#efe7d8;flex:1;min-width:300px}
+.quiz-title{font-size:20px;color:var(--gold);margin-bottom:8px;font-weight:700}
+.question-box{padding:12px;border-radius:10px;border:1px solid rgba(199,154,67,0.08);background:linear-gradient(180deg, rgba(11,77,58,0.12), rgba(3,10,12,0.12));transition:transform .28s ease,opacity .28s ease}
+.question-text{font-size:18px;margin:6px 0 12px}
+.options{list-style:none;padding:0;margin:0}
+.options li{margin:8px 0}
+.opt{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:rgba(255,255,255,0.01);cursor:pointer;font-weight:600}
+.opt.correct{box-shadow:0 8px 26px rgba(84,160,90,0.06);outline:3px solid rgba(84,160,90,0.08)}
+.opt.wrong{outline:3px solid rgba(200,60,60,0.08);opacity:0.95}
+
+/* controls */
+.controls{display:flex;gap:10px;align-items:center;margin-top:14px}
+.next-btn{margin-left:auto;background:transparent;border:2px solid rgba(199,154,67,0.14);padding:10px 16px;border-radius:10px;color:var(--gold);font-weight:700;cursor:pointer}
+.score{font-size:16px;color:var(--gold);font-weight:700;text-align:center}
+
+/* aside */
+.aside-top{display:flex;gap:12px;align-items:center}
+.aside-top .logo-box{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--green),var(--gold));box-shadow:inset 0 -8px 20px rgba(0,0,0,0.3)}
+.qr img{width:120px;height:120px;border-radius:8px;border:4px solid rgba(255,255,255,0.03)}
+
+/* result */
+.result{font-size:22px;color:var(--gold);text-align:center;padding:18px}
+
+/* small screens */
+@media (max-width:780px){
+  .container{padding:20px}
+  .entrance-box{padding:16px}
+}
+</style>
+</head>
+<body>
+<div id="entrance">
+  <div class="entrance-box">
+    <div class="title">Quiz sur la Dynastie Idrisside</div>
+    <div class="subtitle">Plonge sous les lanternes — clique sur Entrer pour commencer</div>
+    <a href="#" id="enter" class="enter-btn">Entrer</a>
+  </div>
+</div>
+
+<div class="lanterns" aria-hidden="true">
+  <svg class="lantern l1" width="64" height="110" viewBox="0 0 64 110"><g><ellipse cx="32" cy="62" rx="18" ry="30" fill="#cf9c49"/><rect x="28" y="8" width="8" height="34" fill="#0b4d3a" opacity="0.9"/></g></svg>
+  <svg class="lantern l2" width="56" height="96" viewBox="0 0 64 110"><g><ellipse cx="32" cy="60" rx="16" ry="26" fill="#b7863f"/><rect x="30" y="10" width="4" height="30" fill="#073b2b" opacity="0.9"/></g></svg>
+  <svg class="lantern l3" width="80" height="130" viewBox="0 0 64 110"><g><ellipse cx="32" cy="62" rx="22" ry="34" fill="#c79a43"/><rect x="26" y="6" width="12" height="32" fill="#0a3e2f" opacity="0.95"/></g></svg>
+  <svg class="lantern l4" width="52" height="88" viewBox="0 0 64 110"><g><ellipse cx="32" cy="58" rx="15" ry="24" fill="#b07a4b"/><rect x="31" y="10" width="2" height="30" fill="#0b4d3a" opacity="0.9"/></g></svg>
+</div>
+
+<main class="container">
+  <section class="card" style="flex:1.4">
+    <div class="quiz-title">Quiz — Dynastie Idrisside</div>
+    <div id="quiz-area">
+      <!-- Question injected here -->
+    </div>
+
+    <div class="controls" style="margin-top:10px">
+      <div class="score" id="score">Score : 0 / 7</div>
+      <button id="next" class="next-btn">Suivant</button>
+    </div>
+  </section>
+
+  <aside class="card" style="max-width:320px">
+    <div class="aside-top">
+      <div class="logo-box"></div>
+      <div>
+        <div style="font-weight:800">Accès rapide</div>
+        <div style="font-size:13px;color:#efe6d6">Scanne le QR pour ouvrir le quiz sur un autre appareil</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px" class="qr">
+      <div style="text-align:center">
+        <img id="qr-local" src="" alt="QR local" />
+        <div style="font-size:13px;margin-top:6px">Local (instructions)</div>
+      </div>
+      <div style="text-align:center">
+        <img id="qr-online" src="" alt="QR online" />
+        <div style="font-size:13px;margin-top:6px">En ligne (placeholder)</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px;font-size:13px;color:#efe6d6">Pour un accès public : héberge sur GitHub Pages et remplace le QR « en ligne » par ton URL.</div>
+  </aside>
+</main>
+
+<!-- Oud audio (autoplay). Note: browsers may block autoplay; a short, silent gain ramp is used to encourage playback. -->
+<audio id="oud" src="oud.mp3" autoplay loop></audio>
+
+<script>
+const questions = [
+  {q:"Qui fut le fondateur de la dynastie idrisside ?", opts:["Idriss Ier","Idriss II","Moulay Ismaïl","Youssef Ibn Tachfine"], a:0},
+  {q:"En quelle année la dynastie idrisside fut-elle fondée ?", opts:["788","909","1055","711"], a:0},
+  {q:"Quelle ville est considérée comme la capitale des Idrissides ?", opts:["Marrakech","Fès","Meknès","Tlemcen"], a:1},
+  {q:"Quel rôle jouait la dynastie idrisside dans la diffusion de l’islam au Maroc ?", opts:["Elle a unifié les tribus berbères sous l’islam","Elle a conquis l’Andalousie","Elle a combattu les Almoravides","Elle a détruit Fès"], a:0},
+  {q:"Quel monument historique est lié aux Idrissides ?", opts:["La Mosquée Al Quaraouiyine","La Koutoubia","La Tour Hassan","Le Palais Bahia"], a:0},
+  {q:"Sous quel règne Fès est-elle devenue un grand centre religieux et intellectuel ? (difficile)", opts:["Idriss Ier","Idriss II","Idriss III","Moulay Rachid"], a:1},
+  {q:"Quelle influence étrangère a contribué au développement culturel sous les Idrissides ? (difficile)", opts:["Andalouse","Romaine","Byzantine","Ottomane"], a:0}
+];
+
+let idx = 0, score = 0;
+const quizArea = document.getElementById('quiz-area');
+const scoreEl = document.getElementById('score');
+const nextBtn = document.getElementById('next');
+
+function render(i){
+  quizArea.innerHTML = '';
+  const box = document.createElement('div'); box.className='question-box';
+  const q = document.createElement('div'); q.className='question-text'; q.innerHTML = `<strong>Q${i+1}.</strong> ${questions[i].q}`;
+  box.appendChild(q);
+  const ul = document.createElement('ul'); ul.className='options';
+  questions[i].opts.forEach((opt,j)=>{
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.className='opt'; b.innerText = opt;
+    b.onclick = ()=>select(b,j,questions[i].a);
+    li.appendChild(b); ul.appendChild(li);
+  });
+  box.appendChild(ul);
+  quizArea.appendChild(box);
+  // disable next until answered
+  nextBtn.disabled = true;
+}
+
+function select(btn, choice, correct){
+  const buttons = document.querySelectorAll('.opt');
+  buttons.forEach(b=>b.disabled=true);
+  if(choice===correct){ btn.classList.add('correct'); score++; }
+  else{ btn.classList.add('wrong'); 
+    buttons.forEach(b=>{
+      if(b.innerText === questions[idx].opts[correct]) b.classList.add('correct');
+    });
+  }
+  scoreEl.innerText = `Score : ${score} / ${questions.length}`;
+  nextBtn.disabled = false;
+}
+
+nextBtn.addEventListener('click', ()=>{
+  idx++;
+  if(idx >= questions.length){ showResult(); } else { render(idx); window.scrollTo({top:0,behavior:'smooth'}); }
+});
+
+function showResult(){
+  quizArea.innerHTML = `<div class="result">${score} / ${questions.length}</div>`;
+  nextBtn.innerText = 'Recommencer'; nextBtn.onclick = ()=>location.reload();
+  nextBtn.disabled = false;
+}
+
+/* Entrance */
+document.getElementById('enter').addEventListener('click', (e)=>{
+  e.preventDefault();
+  const ent = document.getElementById('entrance');
+  ent.style.transition='opacity .8s ease, transform .8s ease';
+  ent.style.opacity='0'; ent.style.transform='scale(0.98)';
+  setTimeout(()=>ent.remove(),900);
+  // try to play audio with slight volume ramp to improve autoplay chances
+  const audio = document.getElementById('oud');
+  audio.volume = 0.0001;
+  const ramp = setInterval(()=>{ if(audio.volume < 0.36){ audio.volume = Math.min(0.36, audio.volume + 0.06); } else { clearInterval(ramp); } }, 220);
+});
+
+/* initialize */
+window.addEventListener('load', ()=>{ render(0); /* set placeholder QR images later */ });
+
+/* set QR images injected by server */
+(function(){
+  const ql = "data:image/png;base64,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";
+  const qo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAeoAAAHqAQAAAADjFjCXAAAEU0lEQVR4nO2cTY7bSAxGH0cCelkCcgAfRb5BjjToI+UG1lF8gABVywZK4CxYP3J3ryQHjsfkwh3JfqgIIKjiRxZFOWDLP0docNxxxx133HHHHXf8vrgUG5EzAGlEZFrtnl2ek4h9iIiU3/0N/3nHnxWfVVU1AiQRlglUr2/KrB8i55ABBgUGVVXVW/zg6o6/GI750ByBOQ6ql5BhjqCXkMu3hIxqBNVYXM/89PLUz+74o/Dx07XM17H+K6IsPyPAoCw/vxFZnvrZHX8U/tnrdDnlkWUCYB2Zr2Nm/iUwx3X84ndP/eyOPwqvXhcUSMAcV7pzKQlYpiHL5t7dVnf8pfFFREQmkHN6Uzlb0vqmcgbb5oFdrpbC3nV1x18Mt1i3CV/LKQMhwzINAKvUS6TExLut7vgr43JOIiwionrtW71V9P2kqpc0ohcA0gjLtLpe5/gRM/ntErSIJuVepmgompteUs1kFldOHN9rFthkvgpKGlFYR0gTQmi+FjIQIpB+ZIEh32d1x18Tv411qvYibdGMWUtZogvEFgnVY53je63GumgCsQkkupxy1ebSZH+F8CF2bznfa3XHXxNvNa9S+CoV2RrhatRrG75YPnxf5/gB+1KHhfJypSUXFyu8lmKsmXud4/uteN0m4Gmp70NpBqg/aS0AzdzrHN9lxX3sbVqS1m3mEIfWc1KbnGbNHuscP2LbbjkTSJoTao16c2yeGDKW63qsc3y/bd+wQPc1c7M5ti2dNX7W1jr3Osf32yabsEAGVOWuvVy19xJTfuJe5/h+q1633cNxKwbXDAP7wv76vs7xg7jpJcsp19MScW39dKts9BKghb67re74q+Gbfd2myG8v3KYS0zPcoDW58Fjn+F4r/XWLAIQPgfB71OWkAKsoaCuBrQJpzAq5dkM99bM7/ii8KSdNqqtinGkoXbnreklPZD3WOX4An/VDVDUjMmF9m3phFWsttm1eKge1WabVO9gdvwOeRiC91UDWG4rTaEKKHcU2/wueTTh+yL7qdYNJdSVzNV8rQgpsNDx/wzq+17al1Qj9nH+/hOqEpck9qO/rHD9iJWiFcjLMtOHW2sSm8aTXxmofgHud4wdw+TeC6rXNdAoZfZd2MgxqmtHHPt1vdcdfDW9V/ZuoV5o862kxrQJxr1J4rHP8gBX3Ydue3quvNa+ow566+b7O8f2mt1buhuKJveeONj8MnyTm+DH8pquzyiLlUGJsKUVzQrsX/Q3r+CH7vvqvupHlqhPWL9qHe53jh/BURg1vT4HFQW1W7CWJTTxhEbHa2H1Xd/y18C+zOmHIQvqRdZl+29REmX+BEMrsJyG0M9pP/eyO/zX4HKHM6kwjbaaYql5F5Mwq+j6BnP/I6o6/BP55X7c53b8thvXJ670jyvd1ju+1b3PYXoztJ7PnermVlJ/62R1/FP55VqfWK+1zOet1+1Uf2PnUz+6444477rjjjjv+f8L/A4CT90hlRCFnAAAAAElFTkSuQmCC";
+  if(ql && !ql.startsWith('%%')) document.getElementById('qr-local').src = ql;
+  if(qo && !qo.startsWith('%%')) document.getElementById('qr-online').src = qo;
+})();
+</script>
+</body>
+</html>
